@@ -2,6 +2,7 @@ package wwerlang.coincounter.service;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.stereotype.Service;
 import wwerlang.coincounter.domain.Bill;
 import wwerlang.coincounter.domain.Coin;
 import wwerlang.coincounter.domain.ExchangeStrategy;
@@ -11,11 +12,23 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
 
+import static java.util.Map.entry;
+
+@Service
 public class ExchangeService {
 
     @Getter
     @Setter
     private Map<Coin, Integer> coinMap;
+
+    public ExchangeService() {
+        coinMap = new TreeMap<>(Map.ofEntries(
+                entry(Coin.COIN_1, 100),
+                entry(Coin.COIN_5, 100),
+                entry(Coin.COIN_10, 100),
+                entry(Coin.COIN_25, 100)
+        ));
+    }
 
     public ExchangeService(Map<Coin, Integer> coinMap) {
         this.coinMap = coinMap;
@@ -23,20 +36,6 @@ public class ExchangeService {
 
     public Map<Coin, Integer> exchangeCoins(int amount) {
         return exchangeCoins(amount, ExchangeStrategy.LEAST_AMOUNT_OF_COINS);
-    }
-
-    public Map<Coin, Integer> exchangeCoins(Map<Bill, Integer> billMap) {
-        return exchangeCoins(billMap, ExchangeStrategy.LEAST_AMOUNT_OF_COINS);
-    }
-
-    public Map<Coin, Integer> exchangeCoins(Map<Bill, Integer> billMap, ExchangeStrategy exchangeStrategy) {
-        int exchangeAmount = 0;
-
-        for (Bill bill : billMap.keySet()) {
-            exchangeAmount += bill.value * billMap.get(bill);
-        }
-
-        return exchangeCoins(exchangeAmount, exchangeStrategy);
     }
 
     public Map<Coin, Integer> exchangeCoins(int amount, ExchangeStrategy exchangeStrategy) {
@@ -72,13 +71,37 @@ public class ExchangeService {
         return exchangedCoins;
     }
 
+    public Map<Coin, Integer> exchangeCoins(Map<Bill, Integer> billMap) {
+        return exchangeCoins(billMap, ExchangeStrategy.LEAST_AMOUNT_OF_COINS);
+    }
+
+    public Map<Coin, Integer> exchangeCoins(Map<Bill, Integer> billMap, ExchangeStrategy exchangeStrategy) {
+        int exchangeAmount = 0;
+
+        for (Bill bill : billMap.keySet()) {
+            exchangeAmount += bill.value * billMap.get(bill);
+        }
+
+        return exchangeCoins(exchangeAmount, exchangeStrategy);
+    }
+
     private Map<Coin, Integer> sortCoinMap(Map<Coin, Integer> initialCoinMap, ExchangeStrategy strategy) {
         TreeMap<Coin, Integer> sortedCoinMap;
 
-        if (strategy == ExchangeStrategy.LEAST_AMOUNT_OF_COINS) {
-            sortedCoinMap = new TreeMap<>(Collections.reverseOrder());
-        } else {
-            sortedCoinMap = new TreeMap<>();
+        if (strategy == null) {
+            strategy = ExchangeStrategy.LEAST_AMOUNT_OF_COINS;
+        }
+
+        switch (strategy) {
+            case LEAST_AMOUNT_OF_COINS:
+                sortedCoinMap = new TreeMap<>(Collections.reverseOrder());
+                break;
+            case MOST_AMOUNT_OF_COINS:
+                sortedCoinMap = new TreeMap<>();
+                break;
+            default:
+                sortedCoinMap = new TreeMap<>(Collections.reverseOrder());
+                break;
         }
 
         sortedCoinMap.putAll(initialCoinMap);
