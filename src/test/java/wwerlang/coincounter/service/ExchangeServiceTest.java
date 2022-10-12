@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import wwerlang.coincounter.domain.Bill;
 import wwerlang.coincounter.domain.Coin;
+import wwerlang.coincounter.domain.ExchangeRequest;
 import wwerlang.coincounter.domain.ExchangeStrategy;
 import wwerlang.coincounter.domain.exceptions.NotEnoughCoinsException;
 
@@ -54,7 +55,8 @@ class ExchangeServiceTest {
         ));
 
         ExchangeService exchangeService = new ExchangeService(initialCoinMap100);
-        Map<Coin, Integer> actualCoinsExchanged = exchangeService.exchangeCoins(exchangeAmount);
+        Map<Coin, Integer> actualCoinsExchanged = exchangeService.exchangeCoins(
+                new ExchangeRequest(exchangeAmount));
 
         assertEquals(expectedCoinsExchanged, actualCoinsExchanged);
         assertEquals(expectedCoinsAvailable, exchangeService.getCoinMap());
@@ -65,6 +67,7 @@ class ExchangeServiceTest {
         int exchangeAmount = 37;
 
         Map<Coin, Integer> expectedCoinsExchanged = new TreeMap<>(Map.ofEntries(
+                entry(Coin.COIN_1, 0),
                 entry(Coin.COIN_5, 40),
                 entry(Coin.COIN_10, 100),
                 entry(Coin.COIN_25, 100)
@@ -78,7 +81,8 @@ class ExchangeServiceTest {
         ));
 
         ExchangeService exchangeService = new ExchangeService(initialCoinMap100);
-        Map<Coin, Integer> actualCoinMap = exchangeService.exchangeCoins(exchangeAmount);
+        Map<Coin, Integer> actualCoinMap = exchangeService.exchangeCoins(
+                new ExchangeRequest(exchangeAmount));
 
         assertEquals(expectedCoinsExchanged, actualCoinMap);
         assertEquals(expectedCoinsAvailable, exchangeService.getCoinMap());
@@ -89,6 +93,8 @@ class ExchangeServiceTest {
         int exchangeAmount = 35;
 
         Map<Coin, Integer> expectedCoinsExchanged = new TreeMap<>(Map.ofEntries(
+                entry(Coin.COIN_1, 0),
+                entry(Coin.COIN_5, 0),
                 entry(Coin.COIN_10, 100),
                 entry(Coin.COIN_25, 100)
         ));
@@ -101,7 +107,8 @@ class ExchangeServiceTest {
         ));
 
         ExchangeService exchangeService = new ExchangeService(initialCoinMap100);
-        Map<Coin, Integer> actualCoinMap = exchangeService.exchangeCoins(exchangeAmount);
+        Map<Coin, Integer> actualCoinMap = exchangeService.exchangeCoins(
+                new ExchangeRequest(exchangeAmount));
 
         assertEquals(expectedCoinsExchanged, actualCoinMap);
         assertEquals(expectedCoinsAvailable, exchangeService.getCoinMap());
@@ -112,6 +119,9 @@ class ExchangeServiceTest {
         int exchangeAmount = 24;
 
         Map<Coin, Integer> expectedCoinsExchanged = new TreeMap<>(Map.ofEntries(
+                entry(Coin.COIN_1, 0),
+                entry(Coin.COIN_5, 0),
+                entry(Coin.COIN_10, 0),
                 entry(Coin.COIN_25, 96)
         ));
 
@@ -123,7 +133,8 @@ class ExchangeServiceTest {
         ));
 
         ExchangeService exchangeService = new ExchangeService(initialCoinMap100);
-        Map<Coin, Integer> actualCoinMap = exchangeService.exchangeCoins(exchangeAmount, ExchangeStrategy.LEAST_AMOUNT_OF_COINS);
+        Map<Coin, Integer> actualCoinMap = exchangeService.exchangeCoins(
+                new ExchangeRequest(exchangeAmount, ExchangeStrategy.LEAST_AMOUNT_OF_COINS));
 
         assertEquals(expectedCoinsExchanged, actualCoinMap);
         assertEquals(expectedCoinsAvailable, exchangeService.getCoinMap());
@@ -134,6 +145,9 @@ class ExchangeServiceTest {
         int exchangeAmount = 1;
 
         Map<Coin, Integer> expectedCoinsExchanged = new TreeMap<>(Map.ofEntries(
+                entry(Coin.COIN_1, 0),
+                entry(Coin.COIN_5, 0),
+                entry(Coin.COIN_10, 0),
                 entry(Coin.COIN_25, 4)
         ));
 
@@ -145,7 +159,8 @@ class ExchangeServiceTest {
         ));
 
         ExchangeService exchangeService = new ExchangeService(initialCoinMap100);
-        Map<Coin, Integer> actualCoinMap = exchangeService.exchangeCoins(exchangeAmount, ExchangeStrategy.LEAST_AMOUNT_OF_COINS);
+        Map<Coin, Integer> actualCoinMap = exchangeService.exchangeCoins(
+                new ExchangeRequest(exchangeAmount, ExchangeStrategy.LEAST_AMOUNT_OF_COINS));
 
         assertEquals(expectedCoinsExchanged, actualCoinMap);
         assertEquals(expectedCoinsAvailable, exchangeService.getCoinMap());
@@ -190,6 +205,7 @@ class ExchangeServiceTest {
         ));
 
         Map<Coin, Integer> expectedCoinsExchanged = new TreeMap<>(Map.ofEntries(
+                entry(Coin.COIN_1, 0),
                 entry(Coin.COIN_5, 40),
                 entry(Coin.COIN_10, 100),
                 entry(Coin.COIN_25, 100)
@@ -217,6 +233,8 @@ class ExchangeServiceTest {
         ));
 
         Map<Coin, Integer> expectedCoinsExchanged = new TreeMap<>(Map.ofEntries(
+                entry(Coin.COIN_1, 0),
+                entry(Coin.COIN_5, 0),
                 entry(Coin.COIN_10, 100),
                 entry(Coin.COIN_25, 100)
         ));
@@ -244,6 +262,9 @@ class ExchangeServiceTest {
         ));
 
         Map<Coin, Integer> expectedCoinsExchanged = new TreeMap<>(Map.ofEntries(
+                entry(Coin.COIN_1, 0),
+                entry(Coin.COIN_5, 0),
+                entry(Coin.COIN_10, 0),
                 entry(Coin.COIN_25, 96)
         ));
 
@@ -268,6 +289,9 @@ class ExchangeServiceTest {
         ));
 
         Map<Coin, Integer> expectedCoinsExchanged = new TreeMap<>(Map.ofEntries(
+                entry(Coin.COIN_1, 0),
+                entry(Coin.COIN_5, 0),
+                entry(Coin.COIN_10, 0),
                 entry(Coin.COIN_25, 4)
         ));
 
@@ -341,7 +365,8 @@ class ExchangeServiceTest {
         ));
 
         ExchangeService exchangeService = new ExchangeService(initialCoinMap500);
-        Map<Coin, Integer> actualCoinMap = exchangeService.exchangeCoins(billMap, ExchangeStrategy.LEAST_AMOUNT_OF_COINS);
+        Map<Coin, Integer> actualCoinMap = exchangeService.exchangeCoins(
+                billMap, ExchangeStrategy.LEAST_AMOUNT_OF_COINS);
 
         assertEquals(expectedCoinsExchanged, actualCoinMap);
         assertEquals(expectedCoinsAvailable, exchangeService.getCoinMap());
@@ -366,7 +391,8 @@ class ExchangeServiceTest {
         ));
 
         ExchangeService exchangeService = new ExchangeService(initialCoinMap100);
-        Map<Coin, Integer> actualCoinMap = exchangeService.exchangeCoins(exchangeAmount, ExchangeStrategy.MOST_AMOUNT_OF_COINS);
+        Map<Coin, Integer> actualCoinMap = exchangeService.exchangeCoins(
+                new ExchangeRequest(exchangeAmount, ExchangeStrategy.MOST_AMOUNT_OF_COINS));
 
         assertEquals(expectedCoinsExchanged, actualCoinMap);
         assertEquals(expectedCoinsAvailable, exchangeService.getCoinMap());
@@ -391,7 +417,8 @@ class ExchangeServiceTest {
         ));
 
         ExchangeService exchangeService = new ExchangeService(initialCoinMap100);
-        Map<Coin, Integer> actualCoinMap = exchangeService.exchangeCoins(exchangeAmount, ExchangeStrategy.MOST_AMOUNT_OF_COINS);
+        Map<Coin, Integer> actualCoinMap = exchangeService.exchangeCoins(
+                new ExchangeRequest(exchangeAmount, ExchangeStrategy.MOST_AMOUNT_OF_COINS));
 
         assertEquals(expectedCoinsExchanged, actualCoinMap);
         assertEquals(expectedCoinsAvailable, exchangeService.getCoinMap());
@@ -404,7 +431,8 @@ class ExchangeServiceTest {
         Map<Coin, Integer> expectedCoinsExchanged = new TreeMap<>(Map.ofEntries(
                 entry(Coin.COIN_1, 100),
                 entry(Coin.COIN_5, 100),
-                entry(Coin.COIN_10, 80)
+                entry(Coin.COIN_10, 80),
+                entry(Coin.COIN_25, 0)
         ));
 
         Map<Coin, Integer> expectedCoinsAvailable = new TreeMap<>(Map.ofEntries(
@@ -415,7 +443,8 @@ class ExchangeServiceTest {
         ));
 
         ExchangeService exchangeService = new ExchangeService(initialCoinMap100);
-        Map<Coin, Integer> actualCoinMap = exchangeService.exchangeCoins(exchangeAmount, ExchangeStrategy.MOST_AMOUNT_OF_COINS);
+        Map<Coin, Integer> actualCoinMap = exchangeService.exchangeCoins(
+                new ExchangeRequest(exchangeAmount, ExchangeStrategy.MOST_AMOUNT_OF_COINS));
 
         assertEquals(expectedCoinsExchanged, actualCoinMap);
         assertEquals(expectedCoinsAvailable, exchangeService.getCoinMap());
@@ -427,7 +456,9 @@ class ExchangeServiceTest {
 
         Map<Coin, Integer> expectedCoinsExchanged = new TreeMap<>(Map.ofEntries(
                 entry(Coin.COIN_1, 100),
-                entry(Coin.COIN_5, 80)
+                entry(Coin.COIN_5, 80),
+                entry(Coin.COIN_10, 0),
+                entry(Coin.COIN_25, 0)
         ));
 
         Map<Coin, Integer> expectedCoinsAvailable = new TreeMap<>(Map.ofEntries(
@@ -438,7 +469,8 @@ class ExchangeServiceTest {
         ));
 
         ExchangeService exchangeService = new ExchangeService(initialCoinMap100);
-        Map<Coin, Integer> actualCoinMap = exchangeService.exchangeCoins(exchangeAmount, ExchangeStrategy.MOST_AMOUNT_OF_COINS);
+        Map<Coin, Integer> actualCoinMap = exchangeService.exchangeCoins(
+                new ExchangeRequest(exchangeAmount, ExchangeStrategy.MOST_AMOUNT_OF_COINS));
 
         assertEquals(expectedCoinsExchanged, actualCoinMap);
         assertEquals(expectedCoinsAvailable, exchangeService.getCoinMap());
@@ -449,7 +481,10 @@ class ExchangeServiceTest {
         int exchangeAmount = 1;
 
         Map<Coin, Integer> expectedCoinsExchanged = new TreeMap<>(Map.ofEntries(
-                entry(Coin.COIN_1, 100)
+                entry(Coin.COIN_1, 100),
+                entry(Coin.COIN_5, 0),
+                entry(Coin.COIN_10, 0),
+                entry(Coin.COIN_25, 0)
         ));
 
         Map<Coin, Integer> expectedCoinsAvailable = new TreeMap<>(Map.ofEntries(
@@ -460,7 +495,8 @@ class ExchangeServiceTest {
         ));
 
         ExchangeService exchangeService = new ExchangeService(initialCoinMap100);
-        Map<Coin, Integer> actualCoinMap = exchangeService.exchangeCoins(exchangeAmount, ExchangeStrategy.MOST_AMOUNT_OF_COINS);
+        Map<Coin, Integer> actualCoinMap = exchangeService.exchangeCoins(
+                new ExchangeRequest(exchangeAmount, ExchangeStrategy.MOST_AMOUNT_OF_COINS));
 
         assertEquals(expectedCoinsExchanged, actualCoinMap);
         assertEquals(expectedCoinsAvailable, exchangeService.getCoinMap());
@@ -505,6 +541,7 @@ class ExchangeServiceTest {
         ));
 
         Map<Coin, Integer> expectedCoinsExchanged = new TreeMap<>(Map.ofEntries(
+                entry(Coin.COIN_1, 0),
                 entry(Coin.COIN_5, 40),
                 entry(Coin.COIN_10, 100),
                 entry(Coin.COIN_25, 100)
@@ -532,6 +569,8 @@ class ExchangeServiceTest {
         ));
 
         Map<Coin, Integer> expectedCoinsExchanged = new TreeMap<>(Map.ofEntries(
+                entry(Coin.COIN_1, 0),
+                entry(Coin.COIN_5, 0),
                 entry(Coin.COIN_10, 100),
                 entry(Coin.COIN_25, 100)
         ));
@@ -586,7 +625,10 @@ class ExchangeServiceTest {
         ));
 
         Map<Coin, Integer> expectedCoinsExchanged = new TreeMap<>(Map.ofEntries(
-                entry(Coin.COIN_1, 100)
+                entry(Coin.COIN_1, 100),
+                entry(Coin.COIN_5, 0),
+                entry(Coin.COIN_10, 0),
+                entry(Coin.COIN_25, 0)
         ));
 
         Map<Coin, Integer> expectedCoinsAvailable = new TreeMap<>(Map.ofEntries(
@@ -671,7 +713,8 @@ class ExchangeServiceTest {
         ExchangeService exchangeService = new ExchangeService(initialCoinMap100);
 
         NotEnoughCoinsException actualException = assertThrowsExactly(NotEnoughCoinsException.class,
-                () -> exchangeService.exchangeCoins(exchangeAmount, ExchangeStrategy.LEAST_AMOUNT_OF_COINS)
+                () -> exchangeService.exchangeCoins(
+                        new ExchangeRequest(exchangeAmount, ExchangeStrategy.MOST_AMOUNT_OF_COINS))
         );
         assertEquals("Not enough coins, missing R$1.00", actualException.getMessage());
     }
@@ -683,7 +726,8 @@ class ExchangeServiceTest {
         ExchangeService exchangeService = new ExchangeService(initialCoinMap100);
 
         NotEnoughCoinsException actualException = assertThrowsExactly(NotEnoughCoinsException.class,
-                () -> exchangeService.exchangeCoins(exchangeAmount, ExchangeStrategy.MOST_AMOUNT_OF_COINS)
+                () -> exchangeService.exchangeCoins(
+                        new ExchangeRequest(exchangeAmount, ExchangeStrategy.MOST_AMOUNT_OF_COINS))
         );
         assertEquals("Not enough coins, missing R$2.00", actualException.getMessage());
     }

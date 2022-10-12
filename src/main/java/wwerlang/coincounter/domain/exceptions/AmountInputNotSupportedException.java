@@ -2,9 +2,9 @@ package wwerlang.coincounter.domain.exceptions;
 
 import wwerlang.coincounter.domain.Bill;
 
-public class InputAmountNotSupportedException extends RuntimeException {
+public class AmountInputNotSupportedException extends RuntimeException {
 
-    public InputAmountNotSupportedException() {
+    public AmountInputNotSupportedException() {
         super();
     }
 

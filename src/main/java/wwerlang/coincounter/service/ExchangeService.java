@@ -2,9 +2,11 @@ package wwerlang.coincounter.service;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import wwerlang.coincounter.domain.Bill;
 import wwerlang.coincounter.domain.Coin;
+import wwerlang.coincounter.domain.ExchangeRequest;
 import wwerlang.coincounter.domain.ExchangeStrategy;
 import wwerlang.coincounter.domain.exceptions.NotEnoughCoinsException;
 
@@ -21,12 +23,21 @@ public class ExchangeService {
     @Setter
     private Map<Coin, Integer> coinMap;
 
+    @Value("${COIN_1_COUNT}")
+    private int INITIAL_COIN_1_COUNT = 100;
+    @Value("${COIN_5_COUNT}")
+    private int INITIAL_COIN_5_COUNT = 100;
+    @Value("${COIN_10_COUNT}")
+    private int INITIAL_COIN_10_COUNT = 100;
+    @Value("${COIN_25_COUNT}")
+    private int INITIAL_COIN_25_COUNT = 100;
+
     public ExchangeService() {
         coinMap = new TreeMap<>(Map.ofEntries(
-                entry(Coin.COIN_1, 100),
-                entry(Coin.COIN_5, 100),
-                entry(Coin.COIN_10, 100),
-                entry(Coin.COIN_25, 100)
+                entry(Coin.COIN_1, INITIAL_COIN_1_COUNT),
+                entry(Coin.COIN_5, INITIAL_COIN_5_COUNT),
+                entry(Coin.COIN_10, INITIAL_COIN_10_COUNT),
+                entry(Coin.COIN_25, INITIAL_COIN_25_COUNT)
         ));
     }
 
@@ -34,13 +45,17 @@ public class ExchangeService {
         this.coinMap = coinMap;
     }
 
-    public Map<Coin, Integer> exchangeCoins(int amount) {
-        return exchangeCoins(amount, ExchangeStrategy.LEAST_AMOUNT_OF_COINS);
-    }
+    public Map<Coin, Integer> exchangeCoins(ExchangeRequest exchangeRequest) {
+        ExchangeStrategy exchangeStrategy = exchangeRequest.getStrategy();
+        double amount = exchangeRequest.getAmount();
 
-    public Map<Coin, Integer> exchangeCoins(int amount, ExchangeStrategy exchangeStrategy) {
         coinMap = sortCoinMap(coinMap, exchangeStrategy);
-        Map<Coin, Integer> exchangedCoins = new TreeMap<>();
+        Map<Coin, Integer> exchangedCoins = new TreeMap<>(Map.ofEntries(
+                entry(Coin.COIN_1, 0),
+                entry(Coin.COIN_5, 0),
+                entry(Coin.COIN_10, 0),
+                entry(Coin.COIN_25, 0)
+        ));
         BigDecimal pendingAmount = BigDecimal.valueOf(amount);
 
         for (Coin coin : coinMap.keySet()) {
@@ -82,15 +97,12 @@ public class ExchangeService {
             exchangeAmount += bill.value * billMap.get(bill);
         }
 
-        return exchangeCoins(exchangeAmount, exchangeStrategy);
+        ExchangeRequest exchangeRequest = new ExchangeRequest(exchangeAmount, exchangeStrategy);
+        return exchangeCoins(exchangeRequest);
     }
 
     private Map<Coin, Integer> sortCoinMap(Map<Coin, Integer> initialCoinMap, ExchangeStrategy strategy) {
         TreeMap<Coin, Integer> sortedCoinMap;
-
-        if (strategy == null) {
-            strategy = ExchangeStrategy.LEAST_AMOUNT_OF_COINS;
-        }
 
         switch (strategy) {
             case LEAST_AMOUNT_OF_COINS:
