@@ -21,41 +21,43 @@ public class ExchangeService {
         this.coinMap = coinMap;
     }
 
-    public Map<Coin, Integer> convertToCoins(int amount) {
-        return convertToCoins(amount, ExchangeStrategy.LEAST_AMOUNT_OF_COINS);
+    public Map<Coin, Integer> exchangeCoins(int amount) {
+        return exchangeCoins(amount, ExchangeStrategy.LEAST_AMOUNT_OF_COINS);
     }
 
-    public Map<Coin, Integer> convertToCoins(Map<Bill, Integer> billMap) {
-        return convertToCoins(billMap, ExchangeStrategy.LEAST_AMOUNT_OF_COINS);
+    public Map<Coin, Integer> exchangeCoins(Map<Bill, Integer> billMap) {
+        return exchangeCoins(billMap, ExchangeStrategy.LEAST_AMOUNT_OF_COINS);
     }
 
-    public Map<Coin, Integer> convertToCoins(Map<Bill, Integer> billMap, ExchangeStrategy exchangeStrategy) {
+    public Map<Coin, Integer> exchangeCoins(Map<Bill, Integer> billMap, ExchangeStrategy exchangeStrategy) {
         int exchangeAmount = 0;
 
         for (Bill bill : billMap.keySet()) {
             exchangeAmount += bill.value * billMap.get(bill);
         }
 
-        return convertToCoins(exchangeAmount, exchangeStrategy);
+        return exchangeCoins(exchangeAmount, exchangeStrategy);
     }
 
-    public Map<Coin, Integer> convertToCoins(int amount, ExchangeStrategy exchangeStrategy) {
-        Map<Coin, Integer> availableCoins = createSortedCoinMap(coinMap, exchangeStrategy);
+    public Map<Coin, Integer> exchangeCoins(int amount, ExchangeStrategy exchangeStrategy) {
+        coinMap = sortCoinMap(coinMap, exchangeStrategy);
         Map<Coin, Integer> exchangedCoins = new TreeMap<>();
         BigDecimal pendingAmount = BigDecimal.valueOf(amount);
 
-        for (Coin coin : availableCoins.keySet()) {
-            int coinsAvailable = availableCoins.get(coin);
+        for (Coin coin : coinMap.keySet()) {
+            int coinsAvailable = coinMap.get(coin);
             BigDecimal amountAvailable = BigDecimal.valueOf(coinsAvailable * coin.value);
             boolean allCoinsAreNeeded = pendingAmount.compareTo(amountAvailable) >= 0;
 
             if (allCoinsAreNeeded) {
                 exchangedCoins.put(coin, coinsAvailable);
                 pendingAmount = pendingAmount.subtract(amountAvailable);
+                coinMap.put(coin, 0);
             } else {
                 int coinsUsed = pendingAmount.divide(BigDecimal.valueOf(coin.value), RoundingMode.DOWN).intValue();
                 exchangedCoins.put(coin, coinsUsed);
                 pendingAmount = pendingAmount.remainder(BigDecimal.valueOf(coin.value));
+                coinMap.put(coin, coinsAvailable - coinsUsed);
             }
 
             if (pendingAmount.compareTo(BigDecimal.ZERO) == 0) {
@@ -70,7 +72,7 @@ public class ExchangeService {
         return exchangedCoins;
     }
 
-    private Map<Coin, Integer> createSortedCoinMap(Map<Coin, Integer> initialCoinMap, ExchangeStrategy strategy) {
+    private Map<Coin, Integer> sortCoinMap(Map<Coin, Integer> initialCoinMap, ExchangeStrategy strategy) {
         TreeMap<Coin, Integer> sortedCoinMap;
 
         if (strategy == ExchangeStrategy.LEAST_AMOUNT_OF_COINS) {
